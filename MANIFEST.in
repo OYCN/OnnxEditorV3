@@ -1,0 +1,5 @@
+exclude onnxeditor/gui/res/res.py
+exclude onnxeditor/gui/ui/iosummary/ui_iosummary.py
+exclude onnxeditor/gui/ui/nodesummary/ui_nodesummary.py
+global-include *.qrc
+global-include *.ui
