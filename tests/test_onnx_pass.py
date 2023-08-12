@@ -1,12 +1,12 @@
 from onnxeditor.ir.port import OnnxImport, OnnxExport
+from onnxeditor.ir.opt import pass_const_to_var
 import onnx.checker
 import onnx
-
 import sys
 
 assert len(sys.argv) == 3
 
-imp = OnnxImport()
+imp = OnnxImport(pass_const_to_var)
 exp = OnnxExport()
 
 m = onnx.load(sys.argv[1])

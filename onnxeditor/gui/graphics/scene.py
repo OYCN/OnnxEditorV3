@@ -50,6 +50,7 @@ class GraphScene(QGraphicsScene):
     def bind_node(self, ir: Union[Node, Variable]):
         if isinstance(ir, Node):
             if ir.op_type in ['Constant']:
+                # we will skip display constant
                 return None
             n = NormalGraphNode(ir, self)
             self._normal_node.append(n)

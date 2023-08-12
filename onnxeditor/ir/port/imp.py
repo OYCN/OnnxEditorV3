@@ -85,6 +85,11 @@ class LazyData(DataBase):
 
 
 class OnnxImport:
+    def __init__(self, pass_fns: list = list()) -> None:
+        if not isinstance(pass_fns, (list, tuple)):
+            pass_fns = [pass_fns]
+        self._pass_fns = pass_fns
+
     def __call__(self, m) -> Model:
         irm = Model()
 
@@ -94,6 +99,10 @@ class OnnxImport:
         assert isinstance(m, onnx.ModelProto), (type(m), m)
 
         self.parse_model(m, irm)
+
+        for fn in self._pass_fns:
+            ret = fn(irm)
+            assert ret[0], ret[1]
 
         return irm
 

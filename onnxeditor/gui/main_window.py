@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QMainWindow, QTabWidget, QMenu, QFileDialog, QMess
 from PySide6.QtGui import QIcon, QAction, QKeySequence
 from PySide6.QtCore import Slot
 from .graph_editor import GraphEditor
-from ..ir import Model, OnnxImport, OnnxExport
+from ..ir import Model, OnnxImport, OnnxExport, pass_const_to_var
 import os
 import onnx
 import onnx.checker
@@ -12,7 +12,7 @@ from typing import Union
 class MainWindow(QMainWindow):
     def __init__(self, irm: Union[Model, None], path: Union[str, None], parent=None):
         super().__init__(parent)
-        self._imp = OnnxImport()
+        self._imp = OnnxImport(pass_const_to_var)
         self._exp = OnnxExport()
 
         self.setWindowIcon(QIcon(":/img/appicon.ico"))
