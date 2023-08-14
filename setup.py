@@ -32,6 +32,7 @@ setup(
         'numpy',
         'pyside6',
         'grandalf',
+        'onnx',
     ],
     python_requires='>=3.6',
     author='oPluss',

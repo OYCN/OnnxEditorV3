@@ -180,9 +180,12 @@ class OnnxImport:
                     elif attr_str == "STRINGS":
                         processed = [p.decode() for p in processed]
                     n.attrs[attr.name] = processed
+                elif attr_str == 'UNDEFINED':
+                    print(f'warning: UNDEFINED attr got in node: {n.name}, op_type: {n.op_type}')
+                    pass
                 else:
                     raise KeyError(
-                        f'attr not handled, maybe new ir: {attr_str}')
+                        f'attr not handled, maybe new ir: {attr_str}, node: {n.name}, op_type: {n.op_type}')
             else:
                 raise KeyError(f'attr not handled, maybe new ir: {attr.type}')
         return n
