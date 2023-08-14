@@ -24,7 +24,7 @@ ONNX_PYTHON_ATTR_MAPPING = {
 
 
 def get_onnx_tensor_shape(onnx_tensor: Union[onnx.ValueInfoProto, onnx.TensorProto]) -> List[int]:
-    shape = None
+    shape = []
     if isinstance(onnx_tensor, onnx.TensorProto):
         shape = onnx_tensor.dims
     else:
