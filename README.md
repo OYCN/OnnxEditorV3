@@ -5,7 +5,10 @@ It is a qt based onnx editor by pure python
 ## Install
 
 ``` bash
+# install from pypip
 pip install onnxeditor
+# or install by git link
+pip install -U git+https://github.com/OYCN/OnnxEditorV3.git
 ```
 
 ## Support List
