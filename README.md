@@ -26,4 +26,21 @@ pip install onnxeditor
 
 ## Knowed Issue
 
- - Sorry, we not test for all case :<
+ > Sorry, we not test for all case :<
+ 
+### Qt Error
+
+**Q:**
+
+> qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+> This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+>
+> Available platform plugins are: linuxfb, eglfs, minimal, minimalegl, vnc, wayland, vkkhrdisplay, offscreen, wayland-egl, xcb.
+
+**A:**
+
+reference: https://bugreports.qt.io/browse/PYSIDE-2306
+
+```bash
+sudo apt install libxcb-cursor0
+```
