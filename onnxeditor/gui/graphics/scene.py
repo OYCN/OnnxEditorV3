@@ -12,7 +12,7 @@ from grandalf.graphs import Graph as GG
 from grandalf.graphs import Vertex as NN
 from grandalf.graphs import Edge as EE
 from grandalf.layouts import SugiyamaLayout
-from ..ui import IOSummary, NodeSummary
+from ..ui import IOSummary, NodeSummary, DataInspector
 import time
 from typing import Union
 
@@ -163,6 +163,8 @@ class GraphScene(QGraphicsScene):
         new_input_act.triggered.connect(add_io(True))
         new_output_act = m.addAction("New Output")
         new_output_act.triggered.connect(add_io(False))
+        add_constant_act = m.addAction("Add Constant")
+        add_constant_act.triggered.connect(self.addConstantDialog)
         m.exec(event.screenPos())
         event.accept()
 
@@ -223,6 +225,14 @@ class GraphScene(QGraphicsScene):
             ret = dialog.getRet()
             return self.addIO(ret['name'], ret['shape'], ret['type'], input)
         return None
+
+    def addConstantDialog(self):
+        dialog = DataInspector()
+        dialog.setWindowTitle('Add Constant')
+        ret = dialog.exec()
+        if ret == QDialog.DialogCode.Accepted:
+            data, name = dialog.getRet()
+            self._ir.getVariable(name).data = data
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         super().keyPressEvent(event)

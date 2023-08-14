@@ -6,6 +6,7 @@ GEN_LIST = [
     ("onnxeditor/gui/res", "res.qrc", "res.py"),
     ("onnxeditor/gui/ui/iosummary", "iosummary.ui", "ui_iosummary.py"),
     ("onnxeditor/gui/ui/nodesummary", "nodesummary.ui", "ui_nodesummary.py"),
+    ("onnxeditor/gui/ui/datainspector", "datainspector.ui", "ui_datainspector.py"),
 ]
 
 

@@ -119,6 +119,7 @@ class Graph(IRObj):
         return v
 
     def getVariable(self, name: str, auto_create=True) -> 'Variable':
+        assert isinstance(name, str)
         if auto_create and name not in self._variables:
             return self.addVariable(name)
         else:

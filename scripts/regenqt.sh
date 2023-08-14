@@ -8,7 +8,7 @@ SCRIPT_DIR=$(
 )
 
 pushd "${SCRIPT_DIR}/onnxeditor/gui/res"
-pyside6-rcc res.qrc -o res.p
+pyside6-rcc res.qrc -o res.py
 popd
 
 pushd "${SCRIPT_DIR}/onnxeditor/gui/ui/iosummary"
@@ -17,4 +17,8 @@ popd
 
 pushd "${SCRIPT_DIR}/onnxeditor/gui/ui/nodesummary"
 pyside6-uic nodesummary.ui -o ui_nodesummary.py
+popd
+
+pushd "${SCRIPT_DIR}/onnxeditor/gui/ui/datainspector"
+pyside6-uic datainspector.ui -o ui_datainspector.py
 popd

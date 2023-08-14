@@ -1,10 +1,12 @@
 from typing import Optional, Any, Union
 import PySide6.QtCore
 from PySide6.QtWidgets import QDialog, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QHeaderView, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QStackedLayout
-from PySide6.QtCore import Qt, Slot
-from ....ir import Node, Variable
+from PySide6.QtCore import Qt, Slot, Signal
+from ....ir import Node, Variable, NativeData
 from .ui_nodesummary import Ui_NodeSummary
+from ..datainspector import DataInspector
 import re
+import numpy as np
 
 
 class AttrValue(QWidget):
@@ -13,9 +15,9 @@ class AttrValue(QWidget):
         self._edit = QLineEdit('-')
         self._btn = QPushButton('Edit Tensor')
 
+        self._data = None
         if isinstance(v, Variable):
-            # TODO(oPluss): invoke tensor editor
-            pass
+            self._data = v.data
         if isinstance(v, (list, tuple)):
             self._edit.setText(','.join([str(vv) for vv in v]))
         else:
@@ -26,6 +28,8 @@ class AttrValue(QWidget):
         self._layout.addWidget(self._btn)
 
         self.setLayout(self._layout)
+        
+        self._btn.clicked.connect(self.set_data)
 
     @Slot(str)
     def needSwitch(self, v):
@@ -52,6 +56,8 @@ class AttrValue(QWidget):
         w = self._layout.currentWidget()
         if w is self._edit:
             txt = self._edit.text()
+            if len(txt) == 0:
+                return ''
             if re.fullmatch(f'^-?\d+$', txt) is not None:
                 return int(txt)
             elif re.fullmatch(f'^-?\d+\.\d*$', txt) is not None:
@@ -62,8 +68,18 @@ class AttrValue(QWidget):
             else:
                 return txt
         else:
-            # TODO(oPluss): return numpy ndarray
-            return None
+            if self._data is None:
+                return np.array([])
+            return self._data
+    
+    @Slot()
+    def set_data(self):
+        dialog = DataInspector(display_name=False)
+        dialog.setWindowTitle('Set Data Attribute')
+        ret = dialog.exec()
+        if ret == QDialog.DialogCode.Accepted:
+            ret = dialog.getRet()[0]
+            self._data = NativeData(ret)
 
 
 class NodeSummary(QDialog):
