@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Any, Union
 import PySide6.QtCore
 from PySide6.QtWidgets import QDialog, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QHeaderView, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QStackedLayout
 from PySide6.QtCore import Qt, Slot
@@ -8,7 +8,7 @@ import re
 
 
 class AttrValue(QWidget):
-    def __init__(self, v, parent: QWidget | None = None) -> None:
+    def __init__(self, v, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
         self._edit = QLineEdit('-')
         self._btn = QPushButton('Edit Tensor')
@@ -67,7 +67,7 @@ class AttrValue(QWidget):
 
 
 class NodeSummary(QDialog):
-    def __init__(self, nir: Node | None = None, parent: QWidget | None = None) -> None:
+    def __init__(self, nir: Union[Node, None] = None, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
         self._ui = Ui_NodeSummary()
         self._ui.setupUi(self)

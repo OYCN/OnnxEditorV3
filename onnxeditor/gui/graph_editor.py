@@ -36,7 +36,7 @@ class GraphEditor(QGraphicsView):
     def name(self):
         return self._ir.name
 
-    def drawBackground(self, painter: QPainter, rect: QRectF | QRect) -> None:
+    def drawBackground(self, painter: QPainter, rect: Union[QRectF, QRect]) -> None:
         super().drawBackground(painter, rect)
 
         def drawGrid(gridStep):

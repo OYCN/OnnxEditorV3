@@ -3,6 +3,7 @@ from typing import List, TYPE_CHECKING
 from PySide6.QtCore import Signal, Qt, QRectF, QPointF, Slot
 from PySide6.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QPainterPath, QPainterPathStroker
 from PySide6.QtWidgets import QGraphicsItem, QGraphicsObject, QGraphicsSceneHoverEvent, QGraphicsSceneMouseEvent, QStyleOptionGraphicsItem, QWidget, QGraphicsPathItem
+from typing import Union
 
 if TYPE_CHECKING:
     from .node import GraphNode
@@ -92,7 +93,7 @@ class GraphEdge(QGraphicsObject):
     def boundingRect(self) -> QRectF:
         return self.shape().boundingRect()
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: QWidget | None = ...) -> None:
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Union[QWidget, None] = ...) -> None:
         painter.save()
         # hovered
         if self._hovered or self.isSelected():

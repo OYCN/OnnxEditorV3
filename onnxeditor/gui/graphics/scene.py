@@ -14,6 +14,7 @@ from grandalf.graphs import Edge as EE
 from grandalf.layouts import SugiyamaLayout
 from ..ui import IOSummary, NodeSummary
 import time
+from typing import Union
 
 
 class GraphScene(QGraphicsScene):
@@ -24,7 +25,7 @@ class GraphScene(QGraphicsScene):
         self._io_node = []
         self._edge = []
         if self._ir is not None:
-            def del_item(o: Node | Variable):
+            def del_item(o: Union[Node, Variable]):
                 n: GraphNode = o.read_ext('bind_gnode')
                 n.setPos(0, 0)
                 self.removeItem(n)

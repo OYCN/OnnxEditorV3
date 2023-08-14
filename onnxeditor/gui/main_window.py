@@ -6,10 +6,11 @@ from ..ir import Model, OnnxImport, OnnxExport
 import os
 import onnx
 import onnx.checker
+from typing import Union
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, irm: Model | None, path: str | None, parent=None):
+    def __init__(self, irm: Union[Model, None], path: Union[str, None], parent=None):
         super().__init__(parent)
         self._imp = OnnxImport()
         self._exp = OnnxExport()
@@ -50,7 +51,7 @@ class MainWindow(QMainWindow):
         act.setStatusTip("Save this onnx file as new file")
         act.setShortcut(QKeySequence('Ctrl+e'))
 
-    def openFile(self, irm: Model | None, path: str | None):
+    def openFile(self, irm: Union[Model, None], path: Union[str, None]):
         if path is None:
             path = ''
             self._path = path

@@ -8,7 +8,7 @@ import re
 
 
 class IOSummary(QDialog):
-    def __init__(self, vir: Variable | None = None, parent: QWidget | None = None) -> None:
+    def __init__(self, vir: Union[Variable, None] = None, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
         self._ui = Ui_IOSummary()
         self._ui.setupUi(self)
