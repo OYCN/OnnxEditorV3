@@ -100,11 +100,11 @@ class GraphScene(QGraphicsScene):
             for s in src:
                 if s.id in N:
                     E.append(
-                        EE(N[s.id], N[n.ir.id], data=f'{s.name} -> {n.ir.name}'))
+                        EE(N[n.ir.id], N[s.id], data=f'{s.name} -> {n.ir.name}'))
             for d in dst:
                 if d.id in N:
                     E.append(
-                        EE(N[n.ir.id], N[d.id], data=f'{n.ir.name} -> {d.name}'))
+                        EE(N[d.id], N[n.ir.id], data=f'{n.ir.name} -> {d.name}'))
         print('cvt done:', time.time() - ts, 's')
         ts = time.time()
         print('gen gc')
@@ -125,21 +125,33 @@ class GraphScene(QGraphicsScene):
         sug.init_all()
         sug.draw()
         box = QRectF()
-        first_node = None
+        top_node = None
         for n in g.C[0].sV:
             x, y = n.view.xy
             w = n.view.w
             h = n.view.h
             x = x - w / 2
-            y = y - h / 2
+            y = - y - h / 2
             this_box = QRectF(x, y, w, h)
             box |= this_box
             # print(n.data.ir.name, x, y)
             n.data.setPos(x, y)
-            if first_node is None:
-                first_node = n.data
             # print(n.data.ir.name, n.data.pos())
+            if top_node is None:
+                top_node = n.data
+            else:
+                if n.data.pos().y() < top_node.pos().y():
+                    top_node = n.data
         print('layout done:', time.time() - ts, 's')
+        top_input_node = None
+        for n in self._io_node:
+            if top_input_node is None:
+                top_input_node = n
+            else:
+                if n.pos().y() < top_input_node.pos().y():
+                    top_input_node = n
+        first_node = top_node if top_input_node is None else top_input_node
+        print(f'layout done, box={box}, first_node: {first_node.pos()}')
         return (box, first_node)
 
     def contextMenuEvent(self, event: QGraphicsSceneContextMenuEvent) -> None:
