@@ -12,7 +12,8 @@ import numpy as np
 class AttrValue(QWidget):
     def __init__(self, v, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
-        self._edit = QLineEdit('-')
+        self._edit = QLineEdit()
+        self._edit.setPlaceholderText("-")
         self._btn = QPushButton('Edit Tensor')
 
         self._data = None
@@ -115,7 +116,7 @@ class NodeSummary(QDialog):
         self._ui.outputs_del.clicked.connect(
             lambda _: self.delItem(self._ui.outputs_list_widget))
         self._ui.attr_add.clicked.connect(
-            lambda _: self.addRow("-", '-', False))
+            lambda _: self.addRow("", '', False))
         self._ui.attr_del.clicked.connect(lambda _: self.delRow())
 
         if nir is not None:
@@ -147,9 +148,12 @@ class NodeSummary(QDialog):
         box.setCurrentIndex(1 if istensor else 0)
         self._ui.attr_tabel_widget.setCellWidget(row, 1, box)
         # name
-        item = QTableWidgetItem(key)
-        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
-        self._ui.attr_tabel_widget.setItem(row, 0, item)
+        # item = QTableWidgetItem(key)
+        # item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+        # self._ui.attr_tabel_widget.setItem(row, 0, item)
+        item = QLineEdit(key)
+        item.setPlaceholderText("-")
+        self._ui.attr_tabel_widget.setCellWidget(row, 0, item)
         # value
         item = AttrValue(value)
         if istensor:
@@ -178,7 +182,8 @@ class NodeSummary(QDialog):
             'attrs': {}
         }
         for r in range(attrs_w.rowCount()):
-            k = attrs_w.item(r, 0).text()
+            # k = attrs_w.item(r, 0).text()
+            k = attrs_w.cellWidget(r, 0).text()
             # t_w = attrs_w.cellWidget(r, 1)
             v_w = attrs_w.cellWidget(r, 2)
             assert k not in ret['attrs']
