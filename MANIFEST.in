@@ -2,3 +2,5 @@ exclude onnxeditor/gui/res/res.py
 global-exclude ui_*.py
 global-include *.qrc
 global-include *.ui
+global-include *.ico
+global-include *.png
