@@ -29,7 +29,7 @@ class AttrValue(QWidget):
         self._layout.addWidget(self._btn)
 
         self.setLayout(self._layout)
-        
+
         self._btn.clicked.connect(self.set_data)
 
     @Slot(str)
@@ -72,7 +72,7 @@ class AttrValue(QWidget):
             if self._data is None:
                 return np.array([])
             return self._data
-    
+
     @Slot()
     def set_data(self):
         dialog = DataInspector(display_name=False)
@@ -108,11 +108,11 @@ class NodeSummary(QDialog):
                                                                            QHeaderView.ResizeMode.Stretch)
 
         self._ui.inputs_add.clicked.connect(
-            lambda _: self.addItem(self._ui.inputs_list_widget, "-"))
+            lambda _: self.addItem(self._ui.inputs_list_widget, ""))
         self._ui.inputs_del.clicked.connect(
             lambda _: self.delItem(self._ui.inputs_list_widget))
         self._ui.outputs_add.clicked.connect(
-            lambda _: self.addItem(self._ui.outputs_list_widget, "-"))
+            lambda _: self.addItem(self._ui.outputs_list_widget, ""))
         self._ui.outputs_del.clicked.connect(
             lambda _: self.delItem(self._ui.outputs_list_widget))
         self._ui.attr_add.clicked.connect(
@@ -130,9 +130,12 @@ class NodeSummary(QDialog):
                 self.addRow(k, v, isinstance(v, Variable))
 
     def addItem(self, lw: QListWidget, name: str):
-        item = QListWidgetItem(name)
-        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+        item = QListWidgetItem()
+        # item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+        txt = QLineEdit(name)
+        txt.setPlaceholderText('-')
         lw.addItem(item)
+        lw.setItemWidget(item, txt)
         lw.setCurrentItem(item)
 
     def delItem(self, lw: QListWidget):
@@ -177,8 +180,8 @@ class NodeSummary(QDialog):
         ret = {
             'name': self._ui.name_edit.text(),
             'op_type': self._ui.op_type_edit.text(),
-            'inputs': [ins_w.item(i).text() for i in range(ins_w.count())],
-            'output': [outs_w.item(i).text() for i in range(outs_w.count())],
+            'inputs': [ins_w.itemWidget(ins_w.item(i)).text() for i in range(ins_w.count())],
+            'output': [outs_w.itemWidget(outs_w.item(i)).text() for i in range(outs_w.count())],
             'attrs': {}
         }
         for r in range(attrs_w.rowCount()):
