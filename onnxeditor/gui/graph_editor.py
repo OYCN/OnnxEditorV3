@@ -1,10 +1,11 @@
 from typing import Union
 from PySide6.QtGui import QPainter, QPen, QColor, QKeyEvent, QWheelEvent, QTransform
 from PySide6.QtWidgets import QGraphicsView, QGraphicsItem
-from PySide6.QtCore import Qt, QRectF, QRect, QLineF, QPointF
+from PySide6.QtCore import Qt, QRectF, QRect, QLineF, QPointF, Slot
 from ..ir import Graph
 from .graphics.scene import GraphScene
 import math
+from .ui import FindBar
 
 
 class GraphEditor(QGraphicsView):
@@ -31,6 +32,9 @@ class GraphEditor(QGraphicsView):
             self.centerOn(first_n)
 
         self.setBackgroundBrush(QColor(53, 53, 53))
+
+        self._find_bar = FindBar(self._ir, self)
+        self._find_bar.centerOn.connect(self.focusOn)
 
     @property
     def name(self):
@@ -134,9 +138,14 @@ class GraphEditor(QGraphicsView):
         vBar.setValue(vBar.minimum())
         self.update()
 
-    def focusOn(self, obj: QGraphicsItem, clean_selected):
+    @Slot(QGraphicsItem)
+    def focusOn(self, obj: QGraphicsItem, clean_selected=True):
         if clean_selected:
             self.scene().clearSelection()
         self.centerOn(obj)
         obj.setSelected(True)
         self.scene().setFocusItem(obj, Qt.FocusReason.MenuBarFocusReason)
+
+    @Slot()
+    def displayFindBar(self):
+        self._find_bar.show()

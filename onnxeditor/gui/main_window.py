@@ -17,14 +17,13 @@ class MainWindow(QMainWindow):
 
         self.setWindowIcon(QIcon(":/img/appicon.ico"))
         self.resize(800, 600)
+        self._lk2ge = []
         self.initActions()
 
         self._path = ''
+        self._irm: Union[Model, None] = None
+        self._ge: Union[GraphEditor, None] = None
         self.openFile(irm, path)
-
-    def add_graph_tab(self, graph_editor, name: str = None):
-        self.tab_widget.addTab(
-            graph_editor, graph_editor.name if name is None else name)
 
     def initActions(self):
         def addMenu(name: str, menu: QMenu = None):
@@ -33,10 +32,11 @@ class MainWindow(QMainWindow):
             else:
                 return menu.addMenu(name)
 
-        def addAction(menu: QMenu, name: str, fn):
+        def addAction(menu: QMenu, name: str, fn=None):
             act = QAction(self)
             act.setText(name)
-            act.triggered.connect(fn)
+            if fn is not None:
+                act.triggered.connect(fn)
             menu.addAction(act)
             return act
         # File
@@ -50,6 +50,15 @@ class MainWindow(QMainWindow):
         act = addAction(menu, "Save as", self.fileSaveAsSlot)
         act.setStatusTip("Save this onnx file as new file")
         act.setShortcut(QKeySequence('Ctrl+e'))
+        # Edit
+        menu = addMenu('Edit')
+        act = addAction(menu, "Find")
+
+        def fn(ge):
+            act.triggered.connect(ge.displayFindBar)
+        self._lk2ge.append(fn)
+        act.setStatusTip("Display Find Bar")
+        act.setShortcut(QKeySequence('Ctrl+f'))
 
     def openFile(self, irm: Union[Model, None], path: Union[str, None]):
         if path is None:
@@ -70,6 +79,8 @@ class MainWindow(QMainWindow):
         self._irm = irm
         self._ge = GraphEditor(irm.graph)
         self.setCentralWidget(self._ge)
+        for fn in self._lk2ge:
+            fn(self._ge)
 
     @Slot()
     def fileOpenSlot(self):

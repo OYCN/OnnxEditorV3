@@ -16,11 +16,11 @@ class GraphNode(QGraphicsWidget):
         super().__init__()
 
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, True)
         self.setAcceptHoverEvents(True)
         self.setZValue(2)
 
         self._hovered = False
-        self._moveable = True
 
     def layoutWith(self, op_type: str, name: Union[str, None], attrs: Union[None, Dict[str, Any]]):
         layout = QGraphicsLinearLayout(Qt.Orientation.Vertical, self)
@@ -82,14 +82,9 @@ class GraphNode(QGraphicsWidget):
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         super().mouseMoveEvent(event)
-        # if self.isSelected():
-        #     pass
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
-        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
-            self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable,
-                         value != 0 and self._moveable)
-        elif change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
+        if change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
             self.pos_move.emit([self])
         return super().itemChange(change, value)
 

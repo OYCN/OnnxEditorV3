@@ -163,6 +163,4 @@ cython_debug/
 onnxeditor/gui/res/res.py
 
 # qt ui autogen
-onnxeditor/gui/ui/iosummary/ui_iosummary.py
-onnxeditor/gui/ui/nodesummary/ui_nodesummary.py
-onnxeditor/gui/ui/datainspector/ui_datainspector.py
+ui_*.py

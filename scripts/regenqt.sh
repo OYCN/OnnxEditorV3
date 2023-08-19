@@ -22,3 +22,7 @@ popd
 pushd "${SCRIPT_DIR}/onnxeditor/gui/ui/datainspector"
 pyside6-uic datainspector.ui -o ui_datainspector.py
 popd
+
+pushd "${SCRIPT_DIR}/onnxeditor/gui/ui/findbar"
+pyside6-uic findbar.ui -o ui_findbar.py
+popd

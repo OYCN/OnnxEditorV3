@@ -1,5 +1,5 @@
 from ...ir import Variable
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Any
 from PySide6.QtCore import Signal, Qt, QRectF, QPointF, Slot
 from PySide6.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QPainterPath, QPainterPathStroker
 from PySide6.QtWidgets import QGraphicsItem, QGraphicsObject, QGraphicsSceneHoverEvent, QGraphicsSceneMouseEvent, QStyleOptionGraphicsItem, QWidget, QGraphicsPathItem
@@ -14,6 +14,7 @@ class GraphEdge(QGraphicsObject):
         super().__init__()
         self._ir: Variable = ir
 
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
         self.setAcceptHoverEvents(True)
         self.setZValue(0)
 
@@ -95,7 +96,7 @@ class GraphEdge(QGraphicsObject):
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Union[QWidget, None] = ...) -> None:
         painter.save()
-        # hovered
+        # line hovered
         if self._hovered or self.isSelected():
             p = QPen()
             p.setWidthF(2 * 3.0)
@@ -104,7 +105,7 @@ class GraphEdge(QGraphicsObject):
             painter.setPen(p)
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawPath(self._path)
-        # normal
+        # line body
         p = QPen()
         p.setWidthF(3.0)
         if len(self._src_pts) > 1:
@@ -115,7 +116,18 @@ class GraphEdge(QGraphicsObject):
         painter.setPen(p)
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawPath(self._path)
-        # ellipse
+        # ellipse hovered
+        color = QColor(255, 165, 0) if self.isSelected(
+        ) else QColor(224, 255, 255)
+        for s in self._src_pts:
+            painter.setPen(color)
+            painter.setBrush(color)
+            painter.drawEllipse(s, 4.0, 4.0)
+        for d in self._dst_pts:
+            painter.setPen(color)
+            painter.setBrush(color)
+            painter.drawEllipse(d, 6.0, 6.0)
+        # ellipse body
         for s in self._src_pts:
             painter.setPen(QColor(128, 128, 128))
             painter.setBrush(QColor(128, 128, 128))
@@ -137,3 +149,13 @@ class GraphEdge(QGraphicsObject):
         self._hovered = False
         self.update()
         return super().hoverLeaveEvent(event)
+
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
+        if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
+            assert isinstance(value, int)
+            if value == 1:
+                self.setZValue(3)
+            else:
+                self.setZValue(0)
+            self.update()
+        return super().itemChange(change, value)

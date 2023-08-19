@@ -9,7 +9,7 @@ import re
 import numpy as np
 
 
-class AttrValue(QWidget):
+class AttrValue(QDialog):
     def __init__(self, v, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
         self._edit = QLineEdit()
