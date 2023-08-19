@@ -2,5 +2,11 @@
 <RCC version="1.0">
     <qresource>
         <file>img/appicon.ico</file>
+        <file>img/input.png</file>
+        <file>img/output.png</file>
+        <file>img/node.png</file>
+        <file>img/var.png</file>
+        <file>img/tensor4.png</file>
+        <file>img/unused.png</file>
     </qresource>
 </RCC>

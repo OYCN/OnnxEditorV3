@@ -1,8 +1,8 @@
 from typing import Optional, Union
-import PySide6.QtCore
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QGraphicsItem, QListWidgetItem
 from PySide6.QtCore import Qt, Slot, Signal, QObject
-from ....ir import Graph
+from ....ir import Graph, Node, Variable
 from .ui_findbar import Ui_FindBar
 import re
 
@@ -29,6 +29,22 @@ class FindBar(QDialog):
 
     def addItem(self, name: str, node: QGraphicsItem):
         item = QListWidgetItem(name)
+        assert node is not None
+        ir = node.ir
+        if isinstance(ir, Node):
+            item.setIcon(QIcon(":/img/node.png"))
+        elif isinstance(ir, Variable):
+            if not ir.used:
+                item.setIcon(QIcon(":/img/unused.png"))
+            else:
+                if ir.isInput:
+                    item.setIcon(QIcon(":/img/input.png"))
+                elif ir.isOutput:
+                    item.setIcon(QIcon(":/img/output.png"))
+                elif ir.isConstant:
+                    item.setIcon(QIcon(":/img/tensor4.png"))
+                else:
+                    item.setIcon(QIcon(":/img/var.png"))
         item.setData(Qt.ItemDataRole.UserRole, node)
         self._ui.ret_list.addItem(item)
 
@@ -70,9 +86,8 @@ class FindBar(QDialog):
                     self.addItem(v.name, v.read_ext('bind_gnode'))
         if self._ui.filter_var.isChecked():
             for v in self._ir.variables:
-                if v.used:
-                    if fn(v.name):
-                        self.addItem(v.name, v.read_ext('bind_gedge'))
+                if fn(v.name):
+                    self.addItem(v.name, v.read_ext('bind_gedge'))
 
     @Slot(QListWidgetItem)
     def onItemDoubleClicked(self, item: QListWidgetItem):
