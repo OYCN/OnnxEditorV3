@@ -108,6 +108,10 @@ class Variable(IRObj):
         self.displayAttr('doc_string')
 
     @property
+    def graph(self):
+        return self._graph
+
+    @property
     def name(self):
         return self._name
 

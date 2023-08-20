@@ -34,7 +34,8 @@ class IOGraphNode(GraphNode):
 
     def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         dialog_name = 'Input' if self._ir.isInput else 'Output'
-        dialog = IOSummary(self._ir)
+        assert self._ir.graph is not None
+        dialog = IOSummary(self._ir, self._ir.graph.variables)
         dialog.setWindowTitle('Edit ' + dialog_name)
         ret = dialog.exec()
         if ret == QDialog.DialogCode.Accepted:

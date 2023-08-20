@@ -230,7 +230,7 @@ class GraphScene(QGraphicsScene):
 
     def addIODialog(self, input=True):
         dialog_name = 'Input' if input else 'Output'
-        dialog = IOSummary()
+        dialog = IOSummary(None, self._ir.variables)
         dialog.setWindowTitle('Add ' + dialog_name)
         ret = dialog.exec()
         if ret == QDialog.DialogCode.Accepted:
