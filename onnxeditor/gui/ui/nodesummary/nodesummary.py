@@ -1,8 +1,8 @@
 from typing import Optional, Any, Union
 import PySide6.QtCore
-from PySide6.QtWidgets import QDialog, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QHeaderView, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QStackedLayout
+from PySide6.QtWidgets import QDialog, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QHeaderView, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QLineEdit, QStackedLayout, QCompleter
 from PySide6.QtCore import Qt, Slot, Signal
-from ....ir import Node, Variable, NativeData
+from ....ir import Node, Variable, NativeData, Graph
 from .ui_nodesummary import Ui_NodeSummary
 from ..datainspector import DataInspector
 import re
@@ -84,10 +84,20 @@ class AttrValue(QWidget):
 
 
 class NodeSummary(QDialog):
-    def __init__(self, nir: Union[Node, None] = None, parent: Union[QWidget, None] = None) -> None:
+    def __init__(self, nir: Union[Node, None] = None, g: Union[Graph, None] = None, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
         self._ui = Ui_NodeSummary()
         self._ui.setupUi(self)
+
+        if g is None:
+            if nir is not None:
+                if nir.graph is not None:
+                    g = nir.graph
+
+        if g is not None:
+            self._cmp = QCompleter([v.name for v in g.variables], self)
+        else:
+            self._cmp = None
 
         header = ['name', 'type', 'value']
         self._ui.inputs_list_widget.setAlternatingRowColors(True)
@@ -131,11 +141,12 @@ class NodeSummary(QDialog):
 
     def addItem(self, lw: QListWidget, name: str):
         item = QListWidgetItem()
-        # item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
-        txt = QLineEdit(name)
-        txt.setPlaceholderText('-')
+        edit = QLineEdit(name)
+        edit.setPlaceholderText('-')
+        if self._cmp is not None:
+            edit.setCompleter(self._cmp)
         lw.addItem(item)
-        lw.setItemWidget(item, txt)
+        lw.setItemWidget(item, edit)
         lw.setCurrentItem(item)
 
     def delItem(self, lw: QListWidget):

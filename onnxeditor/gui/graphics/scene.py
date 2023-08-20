@@ -249,7 +249,7 @@ class GraphScene(QGraphicsScene):
             n.ir.unMarkOutput()
 
     def addNodeDialog(self):
-        dialog = NodeSummary()
+        dialog = NodeSummary(g=self._ir)
         dialog.setWindowTitle('Add Node')
         ret = dialog.exec()
         if ret == QDialog.DialogCode.Accepted:
