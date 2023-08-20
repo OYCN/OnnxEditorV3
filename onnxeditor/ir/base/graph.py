@@ -13,8 +13,8 @@ class Graph(IRObj):
 
         self._variables: Dict['Variable'] = {}
 
-        self.name: str = None
-        self.doc_string: str = None
+        self.name: str = ''
+        self.doc_string: str = ''
         self._nodes: List['Node'] = []
         self._input: List[str] = []
         self._output: List[str] = []

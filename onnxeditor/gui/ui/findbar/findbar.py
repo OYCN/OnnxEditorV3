@@ -80,10 +80,10 @@ class FindBar(QDialog):
         if self._ui.filter_io.isChecked():
             for v in self._ir.input:
                 if fn(v.name):
-                    self.addItem(v.name, v.read_ext('bind_gnode'))
+                    self.addItem(v.name, v.read_ext('bind_gnode_src'))
             for v in self._ir.output:
                 if fn(v.name):
-                    self.addItem(v.name, v.read_ext('bind_gnode'))
+                    self.addItem(v.name, v.read_ext('bind_gnode_dst'))
         if self._ui.filter_var.isChecked():
             for v in self._ir.variables:
                 if fn(v.name):

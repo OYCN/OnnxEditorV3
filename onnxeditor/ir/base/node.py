@@ -35,6 +35,8 @@ class Node(IRObj):
         self.output_change_callback = None
         self.node_remove_callback = None
 
+        self._ext['bind_gnode'] = None
+
     @property
     def input(self):
         if self._graph is None:

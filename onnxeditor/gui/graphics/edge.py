@@ -37,12 +37,15 @@ class GraphEdge(QGraphicsObject):
         dst_obj = [n.read_ext('bind_gnode') for n in self._ir.dst if n.read_ext(
             'bind_gnode') is not None]
         if self._ir.isInput:
-            assert len(src_obj) == 0
-            src_obj = [self._ir.read_ext('bind_gnode')]
-            assert src_obj[0] is not None
+            gn = self._ir.read_ext('bind_gnode_src')
+            assert gn is not None
+            src_obj += [gn]
         if self._ir.isOutput:
-            dst_obj += [self._ir.read_ext('bind_gnode')]
-            assert dst_obj[-1] is not None
+            gn = self._ir.read_ext('bind_gnode_dst')
+            assert gn is not None
+            dst_obj += [gn]
+        assert all([v is not None for v in src_obj])
+        assert all([v is not None for v in dst_obj])
         self.drawEdge(src_obj, dst_obj)
         if node not in src_obj + dst_obj:
             node.pos_move.disconnect(self.needUpdate)

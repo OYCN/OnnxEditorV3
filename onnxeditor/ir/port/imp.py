@@ -1,4 +1,4 @@
-from ..base import Model, Graph, Variable, DataBase, Node
+from ..base import Model, Graph, Variable, DataBase, Node, TensorType
 from typing import TYPE_CHECKING, Union, List
 import onnx
 import onnx.numpy_helper
@@ -139,7 +139,11 @@ class OnnxImport:
     def parse_value_info(self, src: onnx.ValueInfoProto, dst: Graph):
         v = dst.getVariable(src.name)
         if not v.isConstant:
-            v.type = get_onnx_tensor_dtype(src)
+            try:
+                v.type = get_onnx_tensor_dtype(src)
+            except NotImplementedError as e:
+                print(f'get err when handle dtype, skiped: {e}')
+                v.type = TensorType.kNone
             v.shape = get_onnx_tensor_shape(src)
         return v
 
@@ -181,7 +185,8 @@ class OnnxImport:
                         processed = [p.decode() for p in processed]
                     n.attrs[attr.name] = processed
                 elif attr_str == 'UNDEFINED':
-                    print(f'warning: UNDEFINED attr got in node: {n.name}, op_type: {n.op_type}')
+                    print(
+                        f'warning: UNDEFINED attr got in node: {n.name}, op_type: {n.op_type}')
                     pass
                 else:
                     raise KeyError(

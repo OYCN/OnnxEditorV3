@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QTabWidget, QMenu, QFileDialog, QMessageBox
 from PySide6.QtGui import QIcon, QAction, QKeySequence
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, Qt
 from .graph_editor import GraphEditor
 from ..ir import Model, OnnxImport, OnnxExport, pass_const_to_var
 import os
@@ -10,20 +10,22 @@ from typing import Union
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, irm: Union[Model, None], path: Union[str, None], parent=None):
+    def __init__(self, irm: Union[Model, None] = None, path: Union[str, None] = None, parent=None):
         super().__init__(parent)
         self._imp = OnnxImport(pass_const_to_var)
         self._exp = OnnxExport()
 
         self.setWindowIcon(QIcon(":/img/appicon.ico"))
         self.resize(800, 600)
+        # we will connect some signal to loaded ge
         self._lk2ge = []
         self.initActions()
 
         self._path = ''
         self._irm: Union[Model, None] = None
         self._ge: Union[GraphEditor, None] = None
-        self.openFile(irm, path)
+        if irm is not None or path is not None:
+            self.openFile(irm, path)
 
     def initActions(self):
         def addMenu(name: str, menu: QMenu = None):
@@ -53,12 +55,12 @@ class MainWindow(QMainWindow):
         # Edit
         menu = addMenu('Edit')
         act = addAction(menu, "Find")
-
-        def fn(ge):
-            act.triggered.connect(ge.displayFindBar)
-        self._lk2ge.append(fn)
+        self._lk2ge.append(
+            lambda ge, act=act: act.triggered.connect(ge.displayFindBar))
         act.setStatusTip("Display Find Bar")
         act.setShortcut(QKeySequence('Ctrl+f'))
+        act = addAction(menu, "Model Properties")
+        act.setStatusTip("Edit model properties")
 
     def openFile(self, irm: Union[Model, None], path: Union[str, None]):
         if path is None:
@@ -69,7 +71,10 @@ class MainWindow(QMainWindow):
             try:
                 onnx.checker.check_model(m)
             except Exception as e:
-                QMessageBox.warning(self, "onnx checker error", str(e))
+                msb = QMessageBox(QMessageBox.Icon.Warning,
+                                  "onnx checker error", str(e), parent=self)
+                msb.setWindowModality(Qt.WindowModality.WindowModal)
+                msb.show()
             irm = self._imp(path)
         if not path.startswith('(') and len(path) > 0:
             path = '(' + path + ')'

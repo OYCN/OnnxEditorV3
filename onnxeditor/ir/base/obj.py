@@ -20,8 +20,6 @@ class IRObj(metaclass=TypeCheckMeta):
         self._ext: Dict[str, Any] = {
             'display_attr': {},
             'strict_type': {},
-            'bind_gnode': None,
-            'bind_gedge': None,
         }
         self._id = len(self._id_map)
         self._id_map.append(self)

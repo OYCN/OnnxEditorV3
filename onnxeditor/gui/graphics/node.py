@@ -9,6 +9,8 @@ import abc
 
 
 class GraphNode(QGraphicsWidget):
+    _id_counter: int = 0
+
     pos_move = Signal(list)
     io_change = Signal(list)
 
@@ -21,6 +23,13 @@ class GraphNode(QGraphicsWidget):
         self.setZValue(2)
 
         self._hovered = False
+
+        self._id = GraphNode._id_counter
+        GraphNode._id_counter += 1
+
+    @property
+    def id(self):
+        return self._id
 
     def layoutWith(self, op_type: str, name: Union[str, None], attrs: Union[None, Dict[str, Any]]):
         layout = QGraphicsLinearLayout(Qt.Orientation.Vertical, self)

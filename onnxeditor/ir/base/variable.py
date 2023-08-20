@@ -107,6 +107,11 @@ class Variable(IRObj):
         self.displayAttr('_data', name='data')
         self.displayAttr('doc_string')
 
+        self._ext['bind_gedge'] = None
+        self._ext['bind_gnode_src'] = None
+        self._ext['bind_gnode_dst'] = None
+        self._ext['bind_gnode_last'] = None
+
     @property
     def graph(self):
         return self._graph

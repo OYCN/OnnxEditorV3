@@ -50,7 +50,7 @@ class OnnxExport:
 
     def parse_value_info(self, ir: Variable):
         if ir.type is None or ir.type is TensorType.kNone:
-            return None
+            t = 0
         else:
             t = onnx.helper.np_dtype_to_tensor_dtype(
                 np.dtype(ir.type.toNumpy()))

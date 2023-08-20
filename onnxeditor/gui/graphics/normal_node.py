@@ -24,7 +24,7 @@ class NormalGraphNode(GraphNode):
 
         self.layoutWith(self._ir.op_type, None, self._ir.attrs)
 
-        def io_change(v: Variable):
+        def io_change(v: Node):
             assert v.read_ext('bind_gnode') == self
             self.connectToEdge()
             self.io_change.emit([self])
