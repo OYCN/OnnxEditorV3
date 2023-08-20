@@ -3,6 +3,7 @@ from PySide6.QtGui import QIcon, QAction, QKeySequence
 from PySide6.QtCore import Slot, Qt
 from .graph_editor import GraphEditor
 from ..ir import Model, OnnxImport, OnnxExport, pass_const_to_var
+from .ui import ModelEditor
 import os
 import onnx
 import onnx.checker
@@ -59,7 +60,7 @@ class MainWindow(QMainWindow):
             lambda ge, act=act: act.triggered.connect(ge.displayFindBar))
         act.setStatusTip("Display Find Bar")
         act.setShortcut(QKeySequence('Ctrl+f'))
-        act = addAction(menu, "Model Properties")
+        act = addAction(menu, "Model Properties", self.showModelEditDialog)
         act.setStatusTip("Edit model properties")
 
     def openFile(self, irm: Union[Model, None], path: Union[str, None]):
@@ -123,3 +124,11 @@ class MainWindow(QMainWindow):
                 onnx.checker.check_model(m)
             except Exception as e:
                 QMessageBox.warning(self, "onnx checker error", str(e))
+
+    @Slot()
+    def showModelEditDialog(self):
+        dialog = ModelEditor(self._irm, self)
+        dialog.exec()
+        ret = dialog.getRet()
+        for k, v in ret.items():
+            setattr(self._irm, k, v)

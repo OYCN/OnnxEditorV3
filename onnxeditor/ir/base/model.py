@@ -7,13 +7,13 @@ class Model(IRObj):
     def __init__(self) -> None:
         super().__init__()
 
-        self.ir_version: int = None
+        self.ir_version: int = 0
         self.opset_import: Dict[str, int] = {}
-        self.producer_name: str = None
-        self.producer_version: str = None
-        self.domain: str = None
-        self.model_version: int = None
-        self.doc_string: str = None
+        self.producer_name: str = ''
+        self.producer_version: str = ''
+        self.domain: str = ''
+        self.model_version: int = 0
+        self.doc_string: str = ''
         self.graph: Graph = Graph()
 
         self.displayAttr('ir_version')
