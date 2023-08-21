@@ -25,8 +25,7 @@ class MainWindow(QMainWindow):
         self._path = ''
         self._irm: Union[Model, None] = None
         self._ge: Union[GraphEditor, None] = None
-        if irm is not None or path is not None:
-            self.openFile(irm, path)
+        self.openFile(irm, path)
 
     def initActions(self):
         def addMenu(name: str, menu: QMenu = None):
