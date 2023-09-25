@@ -25,8 +25,11 @@ class TensorType(Enum):
     @staticmethod
     def fromNumpy(np_dt):
         np2dt = {
+            np.float16: TensorType.kFP16,
             np.float32: TensorType.kFP32,
             np.float64: TensorType.kFP64,
+            np.bool_: TensorType.kBOOL,
+            np.int8: TensorType.kINT8,
             np.int32: TensorType.kINT32,
             np.int64: TensorType.kINT64,
         }
@@ -37,8 +40,11 @@ class TensorType(Enum):
 
     def toNumpy(self):
         dt2np = {
+            TensorType.kFP16: np.float16,
             TensorType.kFP32: np.float32,
             TensorType.kFP64: np.float64,
+            TensorType.kBOOL: np.bool_,
+            TensorType.kINT8: np.int8,
             TensorType.kINT32: np.int32,
             TensorType.kINT64: np.int64,
         }
