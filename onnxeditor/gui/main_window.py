@@ -65,7 +65,6 @@ class MainWindow(QMainWindow):
     def openFile(self, irm: Union[Model, None], path: Union[str, None]):
         if path is None:
             path = ''
-            self._path = path
         elif irm is None:
             m = onnx.load(path)
             try:
@@ -76,6 +75,7 @@ class MainWindow(QMainWindow):
                 msb.setWindowModality(Qt.WindowModality.WindowModal)
                 msb.show()
             irm = self._imp(path)
+        self._path = path
         if not path.startswith('(') and len(path) > 0:
             path = '(' + path + ')'
         self.setWindowTitle('OnnxEditor' + path)

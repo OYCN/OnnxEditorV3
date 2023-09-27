@@ -26,13 +26,13 @@ class BuildQtFileCommand(build_py):
 
 setup(
     name='onnxeditor',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(),
     install_requires=[
         'numpy',
         'pyside6',
         'grandalf',
-        'onnx',
+        'onnx>=1.13.1',
     ],
     python_requires='>=3.6',
     author='oPluss',
