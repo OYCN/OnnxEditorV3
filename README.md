@@ -1,6 +1,6 @@
 # OnnxEditorV3
 
-It is a qt based onnx editor by pure python
+It is a qt based onnx editor by pure python, more recommended the cpp version: https://github.com/OYCN/OnnxEditorV2
 
 ## Install
 
