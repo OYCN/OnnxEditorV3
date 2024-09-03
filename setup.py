@@ -33,6 +33,7 @@ setup(
         'pyside6',
         'grandalf',
         'onnx>=1.13.1',
+        'fkir',
     ],
     python_requires='>=3.6',
     author='oPluss',
