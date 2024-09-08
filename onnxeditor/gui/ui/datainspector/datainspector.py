@@ -1,17 +1,17 @@
-from typing import Optional, Union
-import PySide6.QtCore
+from typing import  Union
 from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QFileDialog, QMessageBox
-from PySide6.QtCore import Qt, Slot, Signal
-from ....ir import Variable, TensorType
+from PySide6.QtCore import Slot
+from ....ir import OnnxVar
 from .ui_datainspector import Ui_DataInspector
-import re
-import os
 import numpy as np
 
 
 class DataInspector(QDialog):
-    def __init__(self, vir: Union[Variable, None] = None, parent: Union[QWidget, None] = None, display_name: bool = True) -> None:
+    def __init__(self, vir: Union[OnnxVar, None] = None, parent: Union[QWidget, None] = None, display_name: bool = True, path: str = None) -> None:
         super().__init__(parent)
+
+        self._path = '/' if path is None else path
+
         self._ui = Ui_DataInspector()
         self._ui.setupUi(self)
         
@@ -85,5 +85,5 @@ class DataInspector(QDialog):
     def handle_npy(self, path):
         self._data = np.load(path)
         
-    def getRet(self):
+    def get_ret(self):
         return self._data, self._ui.var_name.text()

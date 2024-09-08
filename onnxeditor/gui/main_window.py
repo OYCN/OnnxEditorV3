@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import QMainWindow, QTabWidget, QMenu, QFileDialog, QMessageBox
 from PySide6.QtGui import QIcon, QAction, QKeySequence
 from PySide6.QtCore import Slot, Qt
-from .graph_editor import GraphEditor
-from ..ir import Model, OnnxImport, OnnxExport, pass_const_to_var
+from .editor import Editor
+from ..ir import OnnxImport, OnnxExport, OnnxModel
 from .ui import ModelEditor
 import os
 import onnx
@@ -11,30 +11,27 @@ from typing import Union
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, irm: Union[Model, None] = None, path: Union[str, None] = None, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self._imp = OnnxImport(pass_const_to_var)
-        self._exp = OnnxExport()
 
         self.setWindowIcon(QIcon(":/img/appicon.ico"))
         self.resize(800, 600)
-        # we will connect some signal to loaded ge
-        self._lk2ge = []
-        self.initActions()
+        self.__init_actions()
 
-        self._path = ''
-        self._irm: Union[Model, None] = None
-        self._ge: Union[GraphEditor, None] = None
-        self.openFile(irm, path)
+        self.__set_editor(Editor(OnnxModel(), self))
 
-    def initActions(self):
-        def addMenu(name: str, menu: QMenu = None):
+        self.__path = None
+
+        self.__update_title()
+
+    def __init_actions(self):
+        def add_menu(name: str, menu: QMenu = None):
             if menu is None:
                 return self.menuBar().addMenu(name)
             else:
                 return menu.addMenu(name)
 
-        def addAction(menu: QMenu, name: str, fn=None):
+        def add_action(menu: QMenu, name: str, fn=None):
             act = QAction(self)
             act.setText(name)
             if fn is not None:
@@ -42,92 +39,70 @@ class MainWindow(QMainWindow):
             menu.addAction(act)
             return act
         # File
-        menu = addMenu('File')
-        act = addAction(menu, "Open File", self.fileOpenSlot)
+        menu = add_menu('File')
+        act = add_action(menu, "Open File", self.fileOpenSlot)
         act.setStatusTip("Open an exist onnx file")
         act.setShortcut(QKeySequence('Ctrl+o'))
-        act = addAction(menu, "Save", self.fileSaveSlot)
+        act = add_action(menu, "Save", self.fileSaveSlot)
         act.setStatusTip("Save this onnx file")
         act.setShortcut(QKeySequence('Ctrl+s'))
-        act = addAction(menu, "Save as", self.fileSaveAsSlot)
+        act = add_action(menu, "Save as", self.fileSaveAsSlot)
         act.setStatusTip("Save this onnx file as new file")
         act.setShortcut(QKeySequence('Ctrl+e'))
         # Edit
-        menu = addMenu('Edit')
-        act = addAction(menu, "Find")
-        self._lk2ge.append(
-            lambda ge, act=act: act.triggered.connect(ge.displayFindBar))
+        menu = add_menu('Edit')
+        act = add_action(menu, "Find")
         act.setStatusTip("Display Find Bar")
         act.setShortcut(QKeySequence('Ctrl+f'))
-        act = addAction(menu, "Model Properties", self.showModelEditDialog)
+        act = add_action(menu, "Model Properties", self.showModelEditDialog)
         act.setStatusTip("Edit model properties")
 
-    def openFile(self, irm: Union[Model, None], path: Union[str, None]):
-        if path is None:
-            path = ''
-        elif irm is None:
-            m = onnx.load(path)
-            try:
-                onnx.checker.check_model(m)
-            except Exception as e:
-                msb = QMessageBox(QMessageBox.Icon.Warning,
-                                  "onnx checker error", str(e), parent=self)
-                msb.setWindowModality(Qt.WindowModality.WindowModal)
-                msb.show()
-            irm = self._imp(path)
-        self._path = path
-        if not path.startswith('(') and len(path) > 0:
-            path = '(' + path + ')'
-        self.setWindowTitle('OnnxEditor' + path)
-        if irm is None:
-            irm = Model()
-        self._irm = irm
-        self._ge = GraphEditor(irm.graph)
-        self.setCentralWidget(self._ge)
-        for fn in self._lk2ge:
-            fn(self._ge)
+    def __update_title(self):
+        if self.__path is None:
+            self.setWindowTitle('OnnxEditor')
+        else:
+            self.setWindowTitle(f'OnnxEditor ({self.__path})')
+
+    def __set_editor(self, editor):
+        self.__editor = editor
+        self.setCentralWidget(self.__editor)
+
+    def open_model(self, model: Union[OnnxModel, str, None]):
+        if model is None:
+            model = OnnxModel()
+            self.__path = None
+        elif isinstance(model, str):
+            model = OnnxImport()(model)
+        assert isinstance(model, OnnxModel), (type(model), model)
+        self.__set_editor(Editor(model, self))
+        self.__update_title()
+
 
     @Slot()
-    def fileOpenSlot(self):
+    def file_open_slot(self):
         path = QFileDialog.getOpenFileName(
             self, "open onnx file", "/", '*.onnx')
         if path is None or len(path[0]) == 0:
             return
         else:
-            self.openFile(None, path[0])
+            self.open_model(path[0])
 
     @Slot()
-    def fileSaveSlot(self):
+    def file_save_slot(self):
         if len(self._path) == 0:
             self.fileSaveAsSlot()
         else:
-            m = self._exp(self._irm, self._path)
-            try:
-                onnx.checker.check_model(m)
-            except Exception as e:
-                QMessageBox.warning(self, "onnx checker error", str(e))
+            OnnxExport()(self.__editor.get_model_ir(), self._path)
 
     @Slot()
-    def fileSaveAsSlot(self):
+    def file_save_as_slot(self):
         if len(self._path) == 0:
-            self._path = "/"
+            dir = "/"
         else:
-            self._path = os.path.dirname(self._path)
+            dir = os.path.dirname(self.__path)
         path = QFileDialog.getSaveFileName(
-            self, "save onnx file", self._path, '*.onnx')
+            self, "save onnx file", dir, '*.onnx')
         if path is None or len(path[0]) == 0:
             return
         else:
-            m = self._exp(self._irm, path[0])
-            try:
-                onnx.checker.check_model(m)
-            except Exception as e:
-                QMessageBox.warning(self, "onnx checker error", str(e))
-
-    @Slot()
-    def showModelEditDialog(self):
-        dialog = ModelEditor(self._irm, self)
-        dialog.exec()
-        ret = dialog.getRet()
-        for k, v in ret.items():
-            setattr(self._irm, k, v)
+            OnnxExport()(self.__editor.get_model_ir(), path[0])

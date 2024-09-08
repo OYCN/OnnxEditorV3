@@ -1,8 +1,8 @@
-from typing import Optional, Union
+from typing import Union
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QGraphicsItem, QListWidgetItem
-from PySide6.QtCore import Qt, Slot, Signal, QObject
-from ....ir import Graph, Node, Variable
+from PySide6.QtWidgets import QDialog, QWidget, QGraphicsItem, QListWidgetItem
+from PySide6.QtCore import Qt, Slot, Signal
+from ....ir import OnnxGraph, OnnxNode, OnnxVar
 from .ui_findbar import Ui_FindBar
 import re
 
@@ -10,30 +10,30 @@ import re
 class FindBar(QDialog):
     centerOn = Signal(QGraphicsItem)
 
-    def __init__(self, gir: Graph, parent: Union[QWidget, None] = None) -> None:
+    def __init__(self, gir: OnnxGraph, parent: Union[QWidget, None] = None) -> None:
         super().__init__(parent)
         self._ui = Ui_FindBar()
         self._ui.setupUi(self)
 
         self._ir = gir
 
-        self._ui.btn_find.clicked.connect(self.doFind)
+        self._ui.btn_find.clicked.connect(self.do_find)
 
         self._ui.filter_node.setChecked(True)
         self._ui.filter_io.setChecked(True)
         self._ui.filter_var.setChecked(True)
 
-        self._ui.ret_list.itemDoubleClicked.connect(self.onItemDoubleClicked)
+        self._ui.ret_list.itemDoubleClicked.connect(self.on_item_double_clicked)
 
         self.setWindowTitle('Find')
 
-    def addItem(self, name: str, node: QGraphicsItem):
+    def add_item(self, name: str, node: QGraphicsItem):
         item = QListWidgetItem(name)
         assert node is not None
         ir = node.ir
-        if isinstance(ir, Node):
+        if isinstance(ir, OnnxNode):
             item.setIcon(QIcon(":/img/node.png"))
-        elif isinstance(ir, Variable):
+        elif isinstance(ir, OnnxVar):
             if not ir.used:
                 item.setIcon(QIcon(":/img/unused.png"))
             else:
@@ -48,49 +48,49 @@ class FindBar(QDialog):
         item.setData(Qt.ItemDataRole.UserRole, node)
         self._ui.ret_list.addItem(item)
 
-    def clearItem(self):
+    def clear_item(self):
         self._ui.ret_list.clear()
 
     @Slot()
-    def doFind(self):
-        self.clearItem()
+    def do_find(self):
+        self.clear_item()
 
-        name = self._ui.le_name.text()
-        type = self._ui.find_mod.currentText()
+        data_name = self._ui.le_name.text()
+        data_type = self._ui.find_mod.currentText()
 
-        if type == 'Has':
+        if data_type == 'Has':
             def fn(s):
-                return name in s
-        elif type == 'StartWith':
+                return data_name in s
+        elif data_type == 'StartWith':
             def fn(s):
-                return s.startswith(name)
-        elif type == 'EndsWith':
+                return s.startswith(data_name)
+        elif data_type == 'EndsWith':
             def fn(s):
-                return s.endswith(name)
-        elif type == 'Regex':
+                return s.endswith(data_name)
+        elif data_type == 'Regex':
             def fn(s):
-                return re.fullmatch(name, s) is not None
+                return re.fullmatch(data_name, s) is not None
         else:
-            raise RuntimeError(f'Unknown find type: {type}')
+            raise RuntimeError(f'Unknown find type: {data_type}')
 
         if self._ui.filter_node.isChecked():
             for n in self._ir.nodes:
                 if fn(n.name):
-                    self.addItem(n.name, n.read_ext('bind_gnode'))
+                    self.add_item(n.name, n.read_ext('bind_gnode'))
         if self._ui.filter_io.isChecked():
             for v in self._ir.input:
                 if fn(v.name):
-                    self.addItem(v.name, v.read_ext('bind_gnode_src'))
+                    self.add_item(v.name, v.read_ext('bind_gnode_src'))
             for v in self._ir.output:
                 if fn(v.name):
-                    self.addItem(v.name, v.read_ext('bind_gnode_dst'))
+                    self.add_item(v.name, v.read_ext('bind_gnode_dst'))
         if self._ui.filter_var.isChecked():
             for v in self._ir.variables:
                 if fn(v.name):
-                    self.addItem(v.name, v.read_ext('bind_gedge'))
+                    self.add_item(v.name, v.read_ext('bind_gedge'))
 
     @Slot(QListWidgetItem)
-    def onItemDoubleClicked(self, item: QListWidgetItem):
+    def on_item_double_clicked(self, item: QListWidgetItem):
         it = item.data(Qt.ItemDataRole.UserRole)
         if it is not None:
             self.centerOn.emit(it)
