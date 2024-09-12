@@ -38,30 +38,31 @@ class MainWindow(QMainWindow):
                 act.triggered.connect(fn)
             menu.addAction(act)
             return act
+
         # File
-        menu = add_menu('File')
+        menu = add_menu("File")
         act = add_action(menu, "Open File", self.fileOpenSlot)
         act.setStatusTip("Open an exist onnx file")
-        act.setShortcut(QKeySequence('Ctrl+o'))
+        act.setShortcut(QKeySequence("Ctrl+o"))
         act = add_action(menu, "Save", self.fileSaveSlot)
         act.setStatusTip("Save this onnx file")
-        act.setShortcut(QKeySequence('Ctrl+s'))
+        act.setShortcut(QKeySequence("Ctrl+s"))
         act = add_action(menu, "Save as", self.fileSaveAsSlot)
         act.setStatusTip("Save this onnx file as new file")
-        act.setShortcut(QKeySequence('Ctrl+e'))
+        act.setShortcut(QKeySequence("Ctrl+e"))
         # Edit
-        menu = add_menu('Edit')
+        menu = add_menu("Edit")
         act = add_action(menu, "Find")
         act.setStatusTip("Display Find Bar")
-        act.setShortcut(QKeySequence('Ctrl+f'))
+        act.setShortcut(QKeySequence("Ctrl+f"))
         act = add_action(menu, "Model Properties", self.showModelEditDialog)
         act.setStatusTip("Edit model properties")
 
     def __update_title(self):
         if self.__path is None:
-            self.setWindowTitle('OnnxEditor')
+            self.setWindowTitle("OnnxEditor")
         else:
-            self.setWindowTitle(f'OnnxEditor ({self.__path})')
+            self.setWindowTitle(f"OnnxEditor ({self.__path})")
 
     def __set_editor(self, editor):
         self.__editor = editor
@@ -77,11 +78,9 @@ class MainWindow(QMainWindow):
         self.__set_editor(Editor(model, self))
         self.__update_title()
 
-
     @Slot()
     def file_open_slot(self):
-        path = QFileDialog.getOpenFileName(
-            self, "open onnx file", "/", '*.onnx')
+        path = QFileDialog.getOpenFileName(self, "open onnx file", "/", "*.onnx")
         if path is None or len(path[0]) == 0:
             return
         else:
@@ -100,8 +99,7 @@ class MainWindow(QMainWindow):
             dir = "/"
         else:
             dir = os.path.dirname(self.__path)
-        path = QFileDialog.getSaveFileName(
-            self, "save onnx file", dir, '*.onnx')
+        path = QFileDialog.getSaveFileName(self, "save onnx file", dir, "*.onnx")
         if path is None or len(path[0]) == 0:
             return
         else:

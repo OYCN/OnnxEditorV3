@@ -25,7 +25,7 @@ class FindBar(QDialog):
 
         self._ui.ret_list.itemDoubleClicked.connect(self.on_item_double_clicked)
 
-        self.setWindowTitle('Find')
+        self.setWindowTitle("Find")
 
     def add_item(self, name: str, node: QGraphicsItem):
         item = QListWidgetItem(name)
@@ -58,36 +58,44 @@ class FindBar(QDialog):
         data_name = self._ui.le_name.text()
         data_type = self._ui.find_mod.currentText()
 
-        if data_type == 'Has':
+        if data_type == "Has":
+
             def fn(s):
                 return data_name in s
-        elif data_type == 'StartWith':
+
+        elif data_type == "StartWith":
+
             def fn(s):
                 return s.startswith(data_name)
-        elif data_type == 'EndsWith':
+
+        elif data_type == "EndsWith":
+
             def fn(s):
                 return s.endswith(data_name)
-        elif data_type == 'Regex':
+
+        elif data_type == "Regex":
+
             def fn(s):
                 return re.fullmatch(data_name, s) is not None
+
         else:
-            raise RuntimeError(f'Unknown find type: {data_type}')
+            raise RuntimeError(f"Unknown find type: {data_type}")
 
         if self._ui.filter_node.isChecked():
             for n in self._ir.nodes:
                 if fn(n.name):
-                    self.add_item(n.name, n.read_ext('bind_gnode'))
+                    self.add_item(n.name, n.read_ext("bind_gnode"))
         if self._ui.filter_io.isChecked():
             for v in self._ir.input:
                 if fn(v.name):
-                    self.add_item(v.name, v.read_ext('bind_gnode_src'))
+                    self.add_item(v.name, v.read_ext("bind_gnode_src"))
             for v in self._ir.output:
                 if fn(v.name):
-                    self.add_item(v.name, v.read_ext('bind_gnode_dst'))
+                    self.add_item(v.name, v.read_ext("bind_gnode_dst"))
         if self._ui.filter_var.isChecked():
             for v in self._ir.variables:
                 if fn(v.name):
-                    self.add_item(v.name, v.read_ext('bind_gedge'))
+                    self.add_item(v.name, v.read_ext("bind_gedge"))
 
     @Slot(QListWidgetItem)
     def on_item_double_clicked(self, item: QListWidgetItem):

@@ -59,10 +59,10 @@ class OnnxExport:
             self.parse_value_info(v)
             for v in ir.variables
             if not v.isConstant
-               and v.isUsed
-               and v not in ir.inputs
-               and v not in ir.outputs
-               and v.type is not None
+            and v.isUsed
+            and v not in ir.inputs
+            and v not in ir.outputs
+            and v.type is not None
         ]
         value_info = [v for v in value_info if v is not None]
         inputs.extend(

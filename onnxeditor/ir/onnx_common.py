@@ -30,7 +30,7 @@ ONNX_PYTHON_ATTR_MAPPING = {
 
 
 def get_onnx_tensor_dtype(
-        onnx_tensor: Union[onnx.ValueInfoProto, onnx.TensorProto]
+    onnx_tensor: Union[onnx.ValueInfoProto, onnx.TensorProto]
 ) -> np.dtype:
     if isinstance(onnx_tensor, onnx.TensorProto):
         onnx_type = onnx_tensor.data_type
@@ -43,7 +43,7 @@ def get_onnx_tensor_dtype(
 
 
 def get_onnx_tensor_shape(
-        onnx_tensor: Union[onnx.ValueInfoProto, onnx.TensorProto]
+    onnx_tensor: Union[onnx.ValueInfoProto, onnx.TensorProto]
 ) -> List[int]:
     shape = []
     if isinstance(onnx_tensor, onnx.TensorProto):
@@ -175,9 +175,9 @@ class NoAddAttrBase:
 
     def __setattr__(self, __name: str, __value: Any) -> None:
         if (
-                not hasattr(self, __name)
-                and hasattr(self, "_inited")
-                and not isinstance(getattr(self.__class__, __name, None), property)
+            not hasattr(self, __name)
+            and hasattr(self, "_inited")
+            and not isinstance(getattr(self.__class__, __name, None), property)
         ):
             raise RuntimeError(
                 f"can not set attr for this obj, cld = {self.__class__} k = {__name}, v = {__value}"
@@ -193,6 +193,8 @@ class OnnxVar(NoAddAttrBase, fkir.FkVar):
         self._type = None
         self._data = None
         self._shape = None
+
+        self._graph_bind = None
         NoAddAttrBase.__init__(self)
 
     @property
@@ -257,6 +259,8 @@ class OnnxNode(NoAddAttrBase, fkir.FkNode):
         self.domain: str = None
         self.doc_string: str = None
         self.attrs: Dict[str:Any] = {}
+
+        self._graph_bind = None
         NoAddAttrBase.__init__(self)
 
     def __repr__(self) -> str:
@@ -269,6 +273,8 @@ class OnnxGraph(NoAddAttrBase, fkir.FkGraph):
         self._unique_var_map = {}
         self.name: str = name
         self.doc_string: str = ""
+
+        self._graph_bind = None
         NoAddAttrBase.__init__(self)
 
     def add_node(self, node=None):

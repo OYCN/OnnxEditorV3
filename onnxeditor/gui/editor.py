@@ -15,10 +15,8 @@ class Editor(QGraphicsView):
         self._irm: OnnxModel = irm
 
         self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
-        self.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setTransformationAnchor(
-            QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
 
         s = GraphScene(self._irm.graph, self)
         box, first_n = s.layout()
@@ -39,7 +37,6 @@ class Editor(QGraphicsView):
     def get_model_ir(self):
         return self._irm
 
-
     def drawBackground(self, painter: QPainter, rect: Union[QRectF, QRect]) -> None:
         super().drawBackground(painter, rect)
 
@@ -51,12 +48,24 @@ class Editor(QGraphicsView):
             right = math.floor(br.x() / grid_step + 1.0)
             bottom = math.floor(tl.y() / grid_step - 0.5)
             top = math.floor(br.y() / grid_step + 1.0)
-            for xi in range(left, right+1):
+            for xi in range(left, right + 1):
                 painter.drawLine(
-                    QLineF(xi * grid_step, bottom * grid_step, xi * grid_step, top * grid_step))
-            for yi in range(bottom, top+1):
-                painter.drawLine(QLineF(left * grid_step, yi *
-                                        grid_step, right * grid_step, yi * grid_step))
+                    QLineF(
+                        xi * grid_step,
+                        bottom * grid_step,
+                        xi * grid_step,
+                        top * grid_step,
+                    )
+                )
+            for yi in range(bottom, top + 1):
+                painter.drawLine(
+                    QLineF(
+                        left * grid_step,
+                        yi * grid_step,
+                        right * grid_step,
+                        yi * grid_step,
+                    )
+                )
 
         pen = QPen(QColor(60, 60, 60), 1.0)
         painter.setPen(pen)
@@ -89,7 +98,7 @@ class Editor(QGraphicsView):
 
     def scale_up(self):
         step = 1.2
-        factor = step ** 1
+        factor = step**1
         t = self.transform()
         if t.m11() > 2:
             return

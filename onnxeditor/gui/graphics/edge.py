@@ -1,8 +1,24 @@
-from ...ir import Variable
+from ...ir import OnnxVar
 from typing import List, TYPE_CHECKING, Any
 from PySide6.QtCore import Signal, Qt, QRectF, QPointF, Slot
-from PySide6.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics, QPainterPath, QPainterPathStroker
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsObject, QGraphicsSceneHoverEvent, QGraphicsSceneMouseEvent, QStyleOptionGraphicsItem, QWidget, QGraphicsPathItem
+from PySide6.QtGui import (
+    QPainter,
+    QColor,
+    QPen,
+    QFont,
+    QFontMetrics,
+    QPainterPath,
+    QPainterPathStroker,
+)
+from PySide6.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsObject,
+    QGraphicsSceneHoverEvent,
+    QGraphicsSceneMouseEvent,
+    QStyleOptionGraphicsItem,
+    QWidget,
+    QGraphicsPathItem,
+)
 from typing import Union
 
 if TYPE_CHECKING:
@@ -10,9 +26,9 @@ if TYPE_CHECKING:
 
 
 class GraphEdge(QGraphicsObject):
-    def __init__(self, ir: Variable, parent=None):
+    def __init__(self, ir: OnnxVar, parent=None):
         super().__init__()
-        self._ir: Variable = ir
+        self._ir: OnnxVar = ir
 
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, True)
         self.setAcceptHoverEvents(True)
@@ -29,19 +45,25 @@ class GraphEdge(QGraphicsObject):
         return self._ir
 
     @Slot(list)
-    def needUpdate(self, nodes: List['GraphNode']):
+    def needUpdate(self, nodes: List["GraphNode"]):
         assert len(nodes) == 1
         node = nodes[0]
-        src_obj = [n.read_ext('bind_gnode') for n in self._ir.src if n.read_ext(
-            'bind_gnode') is not None]
-        dst_obj = [n.read_ext('bind_gnode') for n in self._ir.dst if n.read_ext(
-            'bind_gnode') is not None]
+        src_obj = [
+            n.read_ext("bind_gnode")
+            for n in self._ir.src
+            if n.read_ext("bind_gnode") is not None
+        ]
+        dst_obj = [
+            n.read_ext("bind_gnode")
+            for n in self._ir.dst
+            if n.read_ext("bind_gnode") is not None
+        ]
         if self._ir.isInput:
-            gn = self._ir.read_ext('bind_gnode_src')
+            gn = self._ir.read_ext("bind_gnode_src")
             assert gn is not None
             src_obj += [gn]
         if self._ir.isOutput:
-            gn = self._ir.read_ext('bind_gnode_dst')
+            gn = self._ir.read_ext("bind_gnode_dst")
             assert gn is not None
             dst_obj += [gn]
         assert all([v is not None for v in src_obj])
@@ -57,14 +79,16 @@ class GraphEdge(QGraphicsObject):
             pos = o.pos()
             rect = o.boundingRect()
             self._src_pts.append(
-                QPointF(rect.left() + rect.width() / 2, rect.bottom()) + pos)
+                QPointF(rect.left() + rect.width() / 2, rect.bottom()) + pos
+            )
             # print('src', o._ir.name, pos, rect, self._src_pts[-1])
         self._dst_pts.clear()
         for o in dst_obj:
             pos = o.pos()
             rect = o.boundingRect()
             self._dst_pts.append(
-                QPointF(rect.left() + rect.width() / 2, rect.top()) + pos)
+                QPointF(rect.left() + rect.width() / 2, rect.top()) + pos
+            )
             # print('dst', o._ir.name, pos, rect, self._src_pts[-1])
         self._path.clear()
         for s in self._src_pts:
@@ -97,14 +121,20 @@ class GraphEdge(QGraphicsObject):
     def boundingRect(self) -> QRectF:
         return self.shape().boundingRect()
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Union[QWidget, None] = ...) -> None:
+    def paint(
+        self,
+        painter: QPainter,
+        option: QStyleOptionGraphicsItem,
+        widget: Union[QWidget, None] = ...,
+    ) -> None:
         painter.save()
         # line hovered
         if self._hovered or self.isSelected():
             p = QPen()
             p.setWidthF(2 * 3.0)
-            p.setColor(QColor(255, 165, 0) if self.isSelected()
-                       else QColor(224, 255, 255))
+            p.setColor(
+                QColor(255, 165, 0) if self.isSelected() else QColor(224, 255, 255)
+            )
             painter.setPen(p)
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawPath(self._path)
@@ -114,14 +144,14 @@ class GraphEdge(QGraphicsObject):
         if len(self._src_pts) > 1:
             p.setColor(QColor(248, 4, 2))
         else:
-            p.setColor(QColor(100, 100, 100) if self.isSelected()
-                       else QColor(0, 139, 139))
+            p.setColor(
+                QColor(100, 100, 100) if self.isSelected() else QColor(0, 139, 139)
+            )
         painter.setPen(p)
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawPath(self._path)
         # ellipse hovered
-        color = QColor(255, 165, 0) if self.isSelected(
-        ) else QColor(224, 255, 255)
+        color = QColor(255, 165, 0) if self.isSelected() else QColor(224, 255, 255)
         for s in self._src_pts:
             painter.setPen(color)
             painter.setBrush(color)
